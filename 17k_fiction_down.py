@@ -1,16 +1,22 @@
-import time
+#!/usr/bin/env python3.7
+# -*- coding: utf-8 -*
+# author by slo
+
 
 from bs4 import BeautifulSoup
 import requests
 import html5lib
-import lxml
 
 class downloader(object):
     def __init__(self):
         self.url = 'http://www.17k.com'
+        #这里是你要下载的小说目录页
         self.target = 'http://www.17k.com/list/349579.html'
+        #存储小说的章节
         self.names = []
+        #存储小说相应章节的url地址
         self.urls = []
+        #存储下载的章节数
         self.nums = []
 
     # 获取下载链接
@@ -23,6 +29,7 @@ class downloader(object):
         span = BeautifulSoup(str(a), 'html5lib')
         charp_url = span.find_all('a', target='_blank')
         norml_txt = span.find_all('span', class_='ellipsis')
+        #这是[:140]是这本小说一共140章
         self.nums = len(charp_url[:140])
         for each in norml_txt:
             self.names.append(each.string)
