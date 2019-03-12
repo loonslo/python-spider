@@ -1,11 +1,8 @@
 from _queue import Empty
-
 import requests, json, os, threading, time, logging
-from aiohttp import TCPConnector
 from bs4 import BeautifulSoup
-from multiprocessing import Process, Queue, Pool
+from multiprocessing import Process, Queue
 from urllib.request import urlretrieve
-import asyncio, aiohttp
 
 logging.basicConfig(level=logging.ERROR, filename='failed_img.log')
 
@@ -25,14 +22,12 @@ headers = {
 
 '''
 请求知乎回答数据
-:param answers_url: 知乎问题的第一个回答请求地址
-:param imgq: 待下载图片队列
-:param count: 递归结束标识，用于判断是否最后一页
-:return: 
+answers_url: 知乎问题的第一个回答请求地址
+imgq: 待下载图片队列
 '''
 
 
-def getR(answers_url, imgp, count=0):
+def getResp(answers_url, imgq):
     while True:
         try:
             r = requests.get(url=answers_url, headers=headers).content.decode('utf-8')
@@ -43,9 +38,8 @@ def getR(answers_url, imgp, count=0):
             for x in rj['data']:
                 content = x['content']
                 sp = BeautifulSoup(content, 'lxml')
-
                 for img in sp.find_all('img', class_='origin_image'):
-                    imgp.put(img['data-original'])
+                    imgq.put(img['data-original'])
                     print('保存%s到img_queue' % os.path.split(img['data-original'])[1])
                 if rj['paging']['is_end'] != 'True':
                     answers_url = rj['paging']['next']
@@ -55,19 +49,12 @@ def getR(answers_url, imgp, count=0):
 
 
 '''
-'''
-
-'''
-下载进程：分别创建四个线程，用于下载图片
-:param imgq:    待下载图片队列
-:param badq:    下载图片失败队列
-:param pname:   进程名称
-:return: 
+创建下载进程
 '''
 
 
 def download_pro(imgq, badq):
-    for b in range(5):
+    for b in range(4):
         b = threading.Thread(target=download, args=(imgq, badq))
     b.start()
     b.join()
@@ -75,9 +62,8 @@ def download_pro(imgq, badq):
 
 '''
 下载图片函数
-:param imgq:    待下载图片队列
-:param badq:    下载图片失败队列
-:return: 
+imgq:    待下载图片队列
+badq:    下载图片失败队列
 '''
 
 
@@ -105,9 +91,8 @@ def download(imgq, badq):
 
 
 '''
-创建四个线程用于尝试bad_queue队列中的图片，
+创建重复下载线程
 :param badp: bad_queue
-:return: 
 '''
 
 
@@ -120,8 +105,7 @@ def again_pro(badq):
 
 '''
 尝试重复下载bad_queue队列中的图片
-:param badq: bad_queue
-:return: 
+badq: bad_queue
 '''
 
 
@@ -147,9 +131,8 @@ def again_download(badq):
 
 '''
 监听器，用于关闭程序，10秒刷新一次
-:param imgq: img_queue
-:param badq: bad_queue
-:return: 
+imgq: img_queue
+badq: bad_queue 
 '''
 
 
@@ -157,8 +140,8 @@ def monitor(imgq, badq):
     while True:
         time.sleep(10)
         if imgq.empty() and badq.empty():
-            print('所有任务执行完毕，40秒后系统关闭')
-            count = 39
+            print('所有任务执行完毕，10秒后系统关闭')
+            count = 10
             while count > 0:
                 time.sleep(1)
                 print('距离系统关闭还剩：%s秒' % count)
@@ -168,28 +151,27 @@ def monitor(imgq, badq):
 
 if __name__ == '__main__':
     # 请求数据进程
-    request_pro = Process(target=getR, args=(answers_url, img_queue))
+    request_pro = Process(target=getResp, args=(answers_url, img_queue))
 
     # 下载进程启动
     down_pro = Process(target=download_pro, args=(img_queue, bad_queue))
 
     # 处理下载进程失败的图片
     bad_pro = Process(target=again_pro, args=(bad_queue,))
-    bad_pro.daemon = True
 
     # req_pro进程启动
     request_pro.start()
     print('3秒之后开始下载 >>>>>>>>>>>>>>>')
     time.sleep(3)
 
-    ''' 下载图片进程 '''
+    # 下载图片进程启动
     down_pro.start()
 
     # 重复下载进程启动
     bad_pro.start()
 
     # 监听线程：判断系统是否退出
-    #request_pro.join()
+    request_pro.join()
     print('监听线程启动 >>>>>>>>>>>>>>>')
     sys_close_t = threading.Thread(target=monitor, args=(img_queue, bad_queue,))
     sys_close_t.start()
