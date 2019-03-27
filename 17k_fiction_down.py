@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import requests
 
 
-class downloader(object):
+class DownLoader(object):
     def __init__(self):
         self.url = 'http://www.17k.com'
         # 这里是你要下载的小说目录页
@@ -61,7 +61,7 @@ class downloader(object):
 
 
 if __name__ == "__main__":
-    dl = downloader()
+    dl = DownLoader()
     dl.get_download_url()
     print('开始下载')
     for i in range(dl.nums):
