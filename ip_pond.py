@@ -6,7 +6,7 @@ from scrapy.selector import Selector
 import pymysql
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; LBBROWSER) "
+    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.71 Safari/537.1 LBBROWSER"
 }
 
 # 这是自己的数据库
@@ -21,14 +21,14 @@ def rand_sleep_time():
 
 def update_ip_pond():
     # 这个网站目前一共有3637页，这里获取前面的10个页面
-    for i in range(1, 11):
-        rand_sleep_time()
-        resp = requests.get('https://www.xicidaili.com/nn/{0}'.format(i), headers=headers)
-        if resp != '200':
-            print('第%s页获取失败' % i)
-        else:
-            print('已获取第%s页内容' % i)
-    # resp = requests.get('https://www.xicidaili.com/nn/1', headers=headers)
+    for i in range(6, 10):
+        # resp = requests.get('https://www.xicidaili.com/nn/%s' % i, headers=headers)
+        # if resp.status_code != 200:
+        #     print('第%s页获取失败' % i)
+        # else:
+        #     print('已获取第%s页内容' % i)
+        # rand_sleep_time()
+        resp = requests.get('https://www.xicidaili.com/nn/6', headers=headers)
     selector = Selector(text=resp.text)
     all_items = selector.xpath('//*[@id="ip_list"]//tr')
     ip_list = []
@@ -137,6 +137,7 @@ class GetIp(object):
 
 if __name__ == '__main__':
     # 运行以下代码之前，需要先运行update_ip_pond()，将数据填入数据库
+    # 创建数据库时，使用的字段是ip(varchar)(主键)  port(varchar)  proxy_type(varchar) speed(float)
     update_ip_pond()
     # url = 'https://www.baidu.com'
     # headers = {
