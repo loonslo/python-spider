@@ -153,7 +153,7 @@ def monitor(imgq, badq):
 
 if __name__ == '__main__':
     # 请求数据进程
-    request_pro = Process(target=getResp, args=(answers_url, img_queue))
+    request_pro = Process(target=get_resp, args=(answers_url, img_queue))
 
     # 处理下载图片的进程
     down_pro = Process(target=download_pro, args=(img_queue, bad_queue))

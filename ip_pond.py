@@ -1,9 +1,11 @@
+import time
+
 import requests
 from scrapy.selector import Selector
 import pymysql
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; .NET4.0E; LBBROWSER) "
 }
 
 # 这是自己的数据库
@@ -12,10 +14,12 @@ cursor = conn.cursor()
 
 
 def update_ip_pond():
-    # for i in range(3600):
-    #     resp = requests.get('https://www.xicidaili.com/nn/{0}'.format(i), headers=headers)
-
-    resp = requests.get('https://www.xicidaili.com/nn/1', headers=headers)
+    # 这个网站目前一共有3637页，这里获取其中的3600个页面
+    for i in range(1, 3601):
+        resp = requests.get('https://www.xicidaili.com/nn/{0}'.format(i), headers=headers)
+        time.sleep(10)
+        print('已获取第%s页内容' % i)
+    # resp = requests.get('https://www.xicidaili.com/nn/1', headers=headers)
     selector = Selector(text=resp.text)
     all_items = selector.xpath('//*[@id="ip_list"]//tr')
     ip_list = []
@@ -124,7 +128,7 @@ class GetIp(object):
 
 if __name__ == '__main__':
     # 运行以下代码之前，需要先运行update_ip_pond()，将数据填入数据库
-
+    # update_ip_pond()
     url = 'https://www.baidu.com'
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"
