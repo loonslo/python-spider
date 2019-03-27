@@ -30,9 +30,6 @@ def update_ip_pond():
             print('第%s页获取失败' % i)
         else:
             print('已获取第%s页内容' % i)
-        # resp = requests.get('https://www.xicidaili.com/nn/7', headers=headers)
-        print(resp)
-        print(resp.text)
         selector = Selector(text=resp.text)
         all_items = selector.xpath('//*[@id="ip_list"]//tr')
         ip_list = []
