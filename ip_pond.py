@@ -29,7 +29,9 @@ def update_ip_pond():
         proxy_type = item.xpath('td[6]/text()').get().lower()
 
         ip_list.append((ip, port, proxy_type, speed))
+
         for ip_info in ip_list:
+            #sql的作用为：插入并更新相应的字段
             cursor.execute(
                 "insert ip_pond(ip,port,proxy_type,speed) values ('{0}','{1}','{2}','{3}') ON DUPLICATE KEY UPDATE ip=VALUES(ip),port=VALUES(port),proxy_type=VALUES(proxy_type),speed=VALUES(speed)"
                     .format(ip_info[0], ip_info[1], ip_info[2], ip_info[3])

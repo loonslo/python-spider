@@ -3,6 +3,7 @@ import requests, json, os, threading, time, logging
 from bs4 import BeautifulSoup
 from multiprocessing import Process, Queue
 from urllib.request import urlretrieve
+import asyncio
 
 logging.basicConfig(level=logging.ERROR, filename='failed_img.log')
 
@@ -23,11 +24,11 @@ headers = {
 '''
 请求知乎回答数据
 answers_url: 知乎问题的第一个回答请求地址
-imgq: 待下载图片队列
+imgq: 待下载图片队列      
 '''
 
 
-def getResp(answers_url, imgq):
+def get_resp(answers_url, imgq):
     while True:
         try:
             r = requests.get(url=answers_url, headers=headers).content.decode('utf-8')
@@ -53,9 +54,10 @@ def getResp(answers_url, imgq):
 '''
 
 
-def download_pro(imgq, badq):
+async def download_pro(imgq, badq):
     for b in range(4):
         b = threading.Thread(target=download, args=(imgq, badq))
+        await asyncio.sleep(1)
     b.start()
     b.join()
 
@@ -153,7 +155,7 @@ if __name__ == '__main__':
     # 请求数据进程
     request_pro = Process(target=getResp, args=(answers_url, img_queue))
 
-    # 下载进程启动
+    # 处理下载图片的进程
     down_pro = Process(target=download_pro, args=(img_queue, bad_queue))
 
     # 处理下载进程失败的图片
@@ -165,7 +167,11 @@ if __name__ == '__main__':
     time.sleep(3)
 
     # 下载图片进程启动
-    down_pro.start()
+    # down_pro.start()
+    loop = asyncio.get_event_loop()
+    tasks = [down_pro for i in range(10)]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
 
     # 重复下载进程启动
     bad_pro.start()

@@ -5,18 +5,18 @@
 
 from bs4 import BeautifulSoup
 import requests
-import html5lib
+
 
 class downloader(object):
     def __init__(self):
         self.url = 'http://www.17k.com'
-        #这里是你要下载的小说目录页
+        # 这里是你要下载的小说目录页
         self.target = 'http://www.17k.com/list/349579.html'
-        #存储小说的章节
+        # 存储小说的章节
         self.names = []
-        #存储小说相应章节的url地址
+        # 存储小说相应章节的url地址
         self.urls = []
-        #存储下载的章节数
+        # 存储下载的章节数
         self.nums = []
 
     # 获取下载链接
@@ -29,7 +29,7 @@ class downloader(object):
         span = BeautifulSoup(str(a), 'html5lib')
         charp_url = span.find_all('a', target='_blank')
         norml_txt = span.find_all('span', class_='ellipsis')
-        #这是[:140]是这本小说一共140章
+        # 这是[:140]是这本小说一共140章
         self.nums = len(charp_url[:140])
         for each in norml_txt:
             self.names.append(each.string)
@@ -53,7 +53,7 @@ class downloader(object):
     # 把内容写入文本  name章节名，path当前路径下,小说保存名称 text章节内容
     def writer(self, name, path, text):
         with open(path, 'a', encoding='utf-8') as f:
-            if name!=None and path!=None and text!=None:
+            if name != None and path != None and text != None:
                 f.write(name + '\n')
                 f.writelines(text)
                 f.write('\n\n')
