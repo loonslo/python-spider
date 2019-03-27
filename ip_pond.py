@@ -142,7 +142,7 @@ class GetIp(object):
 
 if __name__ == '__main__':
 
-    #当取到的ip是https的时候，会有点慢
+    # 当取到的ip是https的时候，会有点慢
     sql = """
     SELECT * FROM ip_pond
     """
@@ -156,4 +156,3 @@ if __name__ == '__main__':
         res = requests.get(url=url, headers=headers, proxies=proxies)
     else:
         update_ip_pond()
-
