@@ -32,7 +32,7 @@ def get_resp(answers_url, imgq):
     while True:
         try:
             r = requests.get(url=answers_url, headers=headers).content.decode('utf-8')
-        except BaseException:
+        except Exception :
             continue
         else:
             rj = json.loads(r)
