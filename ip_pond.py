@@ -31,7 +31,7 @@ def update_ip_pond():
         ip_list.append((ip, port, proxy_type, speed))
 
         for ip_info in ip_list:
-            #sql的作用为：插入并更新相应的字段
+            # sql的作用为：插入并更新相应的字段
             cursor.execute(
                 "insert ip_pond(ip,port,proxy_type,speed) values ('{0}','{1}','{2}','{3}') ON DUPLICATE KEY UPDATE ip=VALUES(ip),port=VALUES(port),proxy_type=VALUES(proxy_type),speed=VALUES(speed)"
                     .format(ip_info[0], ip_info[1], ip_info[2], ip_info[3])
@@ -57,14 +57,14 @@ class GetIp(object):
         try:
             if proxy_type == 'http':
                 proxy_dict = {
-                    'http': proxy_url
+                    'http': proxy_url,
                 }
+                response = requests.get(http_url, proxies=proxy_dict)
             else:
                 proxy_dict = {
-                    'https': proxy_url
+                    'https': proxy_url,
                 }
-            requests.get(http_url, proxies=proxy_dict)
-            return True
+                response = requests.get(http_url, proxies=proxy_dict, verify=False)
         except Exception as e:
             print('invalid ip and port')
             self.delete_ip(ip)
@@ -111,6 +111,16 @@ class GetIp(object):
             else:
                 return self.get_optimum_ip()
 
+    def get_proxies(self):
+        getip = GetIp()
+        ip = getip.get_random_ip()
+        print(ip)
+        proxy_type = ip.split(':')[0]
+        proxies = {
+            proxy_type: ip
+        }
+        return proxies
+
 
 if __name__ == '__main__':
     # 运行以下代码之前，需要先运行update_ip_pond()，将数据填入数据库
@@ -119,12 +129,6 @@ if __name__ == '__main__':
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"
     }
-    getip = GetIp()
-    ip = getip.get_random_ip()
-    print(ip)
-    proxy_type = ip.split(':')[0]
-    proxies = {
-        proxy_type: ip
-    }
+    proxies = GetIp().get_proxies()
     res = requests.get(url=url, headers=headers, proxies=proxies)
     print(res)
