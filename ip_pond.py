@@ -1,4 +1,5 @@
 import time
+from random import random
 
 import requests
 from scrapy.selector import Selector
@@ -13,12 +14,20 @@ conn = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='jobs'
 cursor = conn.cursor()
 
 
+def rand_sleep_time():
+    sleep_time = random() * 100
+    return time.sleep(sleep_time)
+
+
 def update_ip_pond():
-    # 这个网站目前一共有3637页，这里获取其中的3600个页面
-    for i in range(1, 3601):
+    # 这个网站目前一共有3637页，这里获取前面的10个页面
+    for i in range(1, 11):
+        rand_sleep_time()
         resp = requests.get('https://www.xicidaili.com/nn/{0}'.format(i), headers=headers)
-        time.sleep(10)
-        print('已获取第%s页内容' % i)
+        if resp != '200':
+            print('第%s页获取失败' % i)
+        else:
+            print('已获取第%s页内容' % i)
     # resp = requests.get('https://www.xicidaili.com/nn/1', headers=headers)
     selector = Selector(text=resp.text)
     all_items = selector.xpath('//*[@id="ip_list"]//tr')
@@ -128,11 +137,11 @@ class GetIp(object):
 
 if __name__ == '__main__':
     # 运行以下代码之前，需要先运行update_ip_pond()，将数据填入数据库
-    # update_ip_pond()
-    url = 'https://www.baidu.com'
-    headers = {
-        "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"
-    }
-    proxies = GetIp().get_proxies()
-    res = requests.get(url=url, headers=headers, proxies=proxies)
-    print(res)
+    update_ip_pond()
+    # url = 'https://www.baidu.com'
+    # headers = {
+    #     "User-Agent": "Mozilla/5.0 (X11; U; Linux x86_64; zh-CN; rv:1.9.2.10) Gecko/20100922 Ubuntu/10.10 (maverick) Firefox/3.6.10"
+    # }
+    # proxies = GetIp().get_proxies()
+    # res = requests.get(url=url, headers=headers, proxies=proxies)
+    # print(res)
