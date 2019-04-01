@@ -65,8 +65,9 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   #'jobs.pipelines.JobsPipeline': 300,
-   'jobs.pipelines.LaGouPipeline': 1,
+    # 'jobs.pipelines.JobsPipeline': 300,
+    #'jobs.pipelines.LaGouPipeline': 1,
+    'jobs.pipelines.LaGouTwistedPipeline': 1,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -89,3 +90,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+MYSQL_HOST = '127.0.0.1'
+MYSQL_DBNAME = 'jobs'
+MYSQL_USER = 'root'
+MYSQL_PASSWORD = '123456'
