@@ -29,10 +29,6 @@ def split_time(self):
     return self.split(' ', 1)[0]
 
 
-def remove_xa0(self):
-    return self.replace('\xa0', '')
-
-
 def remove_tags_blank(self):
     return remove_tags(self).replace(' ', '')
 
@@ -41,10 +37,6 @@ def deal_job_addr(self):
     addr_list = self.split('\n')
     addr_list = [item.strip() for item in addr_list if item.strip() != '查看地图']
     return ''.join(addr_list)
-
-
-def change_time(self):
-    return str(self)
 
 
 class LaGouJobItem(scrapy.Item):
