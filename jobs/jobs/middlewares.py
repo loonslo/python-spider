@@ -4,8 +4,9 @@
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-
 from scrapy import signals
+
+from utils import ua_pond
 
 
 class JobsSpiderMiddleware(object):
@@ -101,3 +102,33 @@ class JobsDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class RandomIpUserAgentMiddleware(object):
+
+    def __init__(self,crawler):
+        super(RandomIpUserAgentMiddleware, self).__init__()
+        self.ua = ua_pond.get_ua()
+        #self.proxies = GetIp()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        # This method is used by Scrapy to create your spiders.
+        return cls(crawler)
+
+    def process_request(self, request, spider):
+        # Called for each request that goes through the downloader
+        # middleware.
+
+        # Must either:
+        # - return None: continue processing this request
+        # - or return a Response object
+        # - or return a Request object
+        # - or raise IgnoreRequest: process_exception() methods of
+        #   installed downloader middleware will be called
+        # headers = {
+        #     'User-Agent': self.ua.random,
+        #     'proxies': self.proxies.get_random_ip()
+        # }
+        request.headers.setdefault('User-Agent', self.ua)
+        print(self.ua)
