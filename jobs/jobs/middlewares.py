@@ -7,6 +7,7 @@
 from scrapy import signals
 
 from utils import ua_pond
+from utils.ip_pond import GetIp
 
 
 class JobsSpiderMiddleware(object):
@@ -106,10 +107,10 @@ class JobsDownloaderMiddleware(object):
 
 class RandomIpUserAgentMiddleware(object):
 
-    def __init__(self,crawler):
+    def __init__(self, crawler):
         super(RandomIpUserAgentMiddleware, self).__init__()
-        self.ua = ua_pond.get_ua()
-        #self.proxies = GetIp()
+        self.ua = ua_pond
+        # self.proxies = GetIp()
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -127,8 +128,10 @@ class RandomIpUserAgentMiddleware(object):
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
         # headers = {
-        #     'User-Agent': self.ua.random,
+        #     'User-Agent': self.ua.get_ua(),
         #     'proxies': self.proxies.get_random_ip()
         # }
-        request.headers.setdefault('User-Agent', self.ua)
-        print(self.ua)
+        # request.headers.setdefault(headers)
+        t = self.ua.get_ua()
+        print(t)
+        request.headers.setdefault('proxies', t)
