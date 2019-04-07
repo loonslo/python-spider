@@ -24,3 +24,4 @@ ps.直接使用了_swayer 提供的url，这个问题下图片超级多 :P
 ## lagou.py
 使用scrapy 拉取拉钩全站职位信息的爬虫，并将职位信息存储至本地mysql.
 在middleware中随机更换user-agent
+ps.scrapy爬取速度过快，建议将delay设置为5以上
